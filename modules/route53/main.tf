@@ -21,12 +21,12 @@ locals {
 
 resource "aws_route53_health_check" "primary" {
   fqdn              = var.primary_alb_dns
-  port               = 443
-  type               = "HTTPS"
-  resource_path      = var.health_check_path
-  failure_threshold  = 3
-  request_interval   = 30
-  measure_latency    = true
+  port              = 443
+  type              = "HTTPS"
+  resource_path     = var.health_check_path
+  failure_threshold = 3
+  request_interval  = 30
+  measure_latency   = true
 
   tags = {
     Name = "${var.name_prefix}-primary-health-check"
@@ -39,12 +39,12 @@ resource "aws_route53_health_check" "dr" {
   count = var.enable_dr ? 1 : 0
 
   fqdn              = var.dr_alb_dns
-  port               = 443
-  type               = "HTTPS"
-  resource_path      = var.health_check_path
-  failure_threshold  = 3
-  request_interval   = 30
-  measure_latency    = true
+  port              = 443
+  type              = "HTTPS"
+  resource_path     = var.health_check_path
+  failure_threshold = 3
+  request_interval  = 30
+  measure_latency   = true
 
   tags = {
     Name = "${var.name_prefix}-dr-health-check"

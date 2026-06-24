@@ -3,8 +3,8 @@
 ################################################################################
 
 resource "random_password" "redis_auth" {
-  length           = 64
-  special          = false # Redis auth tokens cannot contain certain special chars
+  length  = 64
+  special = false # Redis auth tokens cannot contain certain special chars
 }
 
 # Store Redis auth token in Secrets Manager
@@ -52,11 +52,11 @@ resource "aws_elasticache_replication_group" "this" {
   auth_token                 = random_password.redis_auth.result
 
   # Maintenance
-  maintenance_window       = "sun:05:00-sun:06:00"
-  snapshot_retention_limit = var.snapshot_retention_limit
-  snapshot_window          = "03:00-04:00"
+  maintenance_window         = "sun:05:00-sun:06:00"
+  snapshot_retention_limit   = var.snapshot_retention_limit
+  snapshot_window            = "03:00-04:00"
   auto_minor_version_upgrade = true
-  apply_immediately        = var.environment == "dev" ? true : false
+  apply_immediately          = var.environment == "dev" ? true : false
 
   # Notifications
   notification_topic_arn = var.sns_topic_arn

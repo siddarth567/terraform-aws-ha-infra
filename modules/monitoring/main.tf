@@ -195,8 +195,8 @@ resource "aws_cloudwatch_metric_alarm" "alb_unhealthy_hosts" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 
   dimensions = {
-    LoadBalancer  = var.alb_arn_suffix
-    TargetGroup   = var.target_group_arn_suffix
+    LoadBalancer = var.alb_arn_suffix
+    TargetGroup  = var.target_group_arn_suffix
   }
 
   tags = {
@@ -218,7 +218,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         width  = 12
         height = 6
         properties = {
-          title   = "ECS CPU & Memory Utilization"
+          title = "ECS CPU & Memory Utilization"
           metrics = [
             ["AWS/ECS", "CPUUtilization", "ClusterName", var.ecs_cluster_name, "ServiceName", var.ecs_service_name],
             ["AWS/ECS", "MemoryUtilization", "ClusterName", var.ecs_cluster_name, "ServiceName", var.ecs_service_name]
@@ -236,7 +236,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         width  = 12
         height = 6
         properties = {
-          title   = "RDS CPU Utilization"
+          title = "RDS CPU Utilization"
           metrics = [
             ["AWS/RDS", "CPUUtilization", "DBClusterIdentifier", var.rds_cluster_id]
           ]
@@ -253,7 +253,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         width  = 12
         height = 6
         properties = {
-          title   = "ALB Request Count & Latency"
+          title = "ALB Request Count & Latency"
           metrics = [
             ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", var.alb_arn_suffix],
             ["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", var.alb_arn_suffix]
@@ -271,7 +271,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         width  = 12
         height = 6
         properties = {
-          title   = "ALB HTTP Error Codes"
+          title = "ALB HTTP Error Codes"
           metrics = [
             ["AWS/ApplicationELB", "HTTPCode_Target_4XX_Count", "LoadBalancer", var.alb_arn_suffix],
             ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", var.alb_arn_suffix]

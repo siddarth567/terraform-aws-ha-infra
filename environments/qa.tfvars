@@ -25,7 +25,7 @@ db_name            = "appdb"
 db_master_username = "dbadmin"
 
 # DNS
-domain_name    = "qa.example.com"
+domain_name     = "qa.example.com"
 create_dns_zone = true
 
 # Security

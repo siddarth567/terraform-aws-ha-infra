@@ -64,7 +64,7 @@ resource "aws_rds_cluster" "this" {
   skip_final_snapshot          = var.environment == "dev" ? true : false
 
   # Protection
-  deletion_protection = var.deletion_protection
+  deletion_protection             = var.deletion_protection
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
   # Serverless V2 scaling (optional)
@@ -96,9 +96,9 @@ resource "aws_rds_cluster_instance" "this" {
   engine             = aws_rds_cluster.this.engine
   engine_version     = aws_rds_cluster.this.engine_version
 
-  publicly_accessible          = false
-  auto_minor_version_upgrade   = true
-  performance_insights_enabled = true
+  publicly_accessible             = false
+  auto_minor_version_upgrade      = true
+  performance_insights_enabled    = true
   performance_insights_kms_key_id = var.kms_key_arn
 
   monitoring_interval = 60

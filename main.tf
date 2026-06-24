@@ -12,7 +12,7 @@
 module "kms" {
   source = "./modules/kms"
 
-  name_prefix       = local.name_prefix
+  name_prefix         = local.name_prefix
   enable_multi_region = local.config.enable_dr
 }
 
@@ -21,8 +21,8 @@ module "kms" {
 module "iam" {
   source = "./modules/iam"
 
-  name_prefix        = local.name_prefix
-  kms_key_arn        = module.kms.app_key_arn
+  name_prefix         = local.name_prefix
+  kms_key_arn         = module.kms.app_key_arn
   create_bastion_role = var.enable_bastion
 }
 
@@ -219,15 +219,15 @@ module "bastion" {
 module "monitoring" {
   source = "./modules/monitoring"
 
-  name_prefix            = local.name_prefix
-  alert_email            = var.alert_email
-  kms_key_id             = module.kms.logs_key_id
-  kms_key_arn            = module.kms.logs_key_arn
-  cloudtrail_bucket_name = module.s3.cloudtrail_bucket_name
-  cloudtrail_role_arn    = module.iam.cloudtrail_role_arn
-  ecs_cluster_name       = module.ecs.cluster_name
-  ecs_service_name       = module.ecs.service_name
-  rds_cluster_id         = module.rds.cluster_id
-  alb_arn_suffix         = module.alb.alb_arn
+  name_prefix             = local.name_prefix
+  alert_email             = var.alert_email
+  kms_key_id              = module.kms.logs_key_id
+  kms_key_arn             = module.kms.logs_key_arn
+  cloudtrail_bucket_name  = module.s3.cloudtrail_bucket_name
+  cloudtrail_role_arn     = module.iam.cloudtrail_role_arn
+  ecs_cluster_name        = module.ecs.cluster_name
+  ecs_service_name        = module.ecs.service_name
+  rds_cluster_id          = module.rds.cluster_id
+  alb_arn_suffix          = module.alb.alb_arn
   target_group_arn_suffix = module.alb.target_group_arn
 }
