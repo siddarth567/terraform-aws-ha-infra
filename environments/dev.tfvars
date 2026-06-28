@@ -33,7 +33,7 @@ allowed_bastion_cidrs      = ["0.0.0.0/0"] # Restrict in real environments!
 enable_deletion_protection = false
 
 # Monitoring
-alert_email = "dev-alerts@example.com"
+alert_email = "ksiddharth263@gmail.com"
 
 # Feature Flags
 enable_dr_region = false
