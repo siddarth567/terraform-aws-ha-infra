@@ -20,7 +20,7 @@ CREATE TABLE accounts (
     account_number VARCHAR(20) UNIQUE NOT NULL,
     account_type VARCHAR(20) CHECK (account_type IN ('savings', 'checking', 'business')),
     balance DECIMAL(15,2) DEFAULT 0.00,
-    currency VARCHAR(3) DEFAULT 'USD',
+    currency VARCHAR(3) DEFAULT 'INR',
     status VARCHAR(10) DEFAULT 'active' CHECK (status IN ('active', 'frozen', 'closed')),
     created_at TIMESTAMP DEFAULT NOW()
 );

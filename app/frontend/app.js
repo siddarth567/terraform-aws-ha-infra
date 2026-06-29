@@ -8,8 +8,8 @@ let accounts = [];
 const DEMO = true; // Set false when backend is running
 const demoUser = { id: '1', name: 'Sid', email: 'sid@example.com' };
 const demoAccounts = [
-    { id: 'a1', account_number: 'ACC-10001001', account_type: 'savings', balance: 15420.50, currency: 'USD', status: 'active' },
-    { id: 'a2', account_number: 'ACC-10001002', account_type: 'checking', balance: 3280.75, currency: 'USD', status: 'active' },
+    { id: 'a1', account_number: 'ACC-10001001', account_type: 'savings', balance: 15420.50, currency: 'INR', status: 'active' },
+    { id: 'a2', account_number: 'ACC-10001002', account_type: 'checking', balance: 3280.75, currency: 'INR', status: 'active' },
 ];
 let demoTransactions = [
     { id: 't1', from_acc_num: 'ACC-10001001', to_acc_num: 'ACC-10001002', amount: 500, type: 'transfer', description: 'Monthly savings', created_at: new Date(Date.now() - 86400000).toISOString() },
@@ -182,7 +182,7 @@ document.getElementById('transferForm').addEventListener('submit', async (e) => 
 });
 
 // ─── Helpers ────────────────────────────────────────────────────────
-function formatCurrency(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n); }
+function formatCurrency(n) { return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(n); }
 
 // ─── Auto-login if token exists ─────────────────────────────────────
 if (token && currentUser) { enterDashboard(); }
