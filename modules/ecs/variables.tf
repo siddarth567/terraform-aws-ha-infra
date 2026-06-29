@@ -114,3 +114,29 @@ variable "kms_key_id" {
   type        = string
   default     = ""
 }
+
+# ─── Banking App DB Connection ───────────────────────────────────────────────
+
+variable "db_host" {
+  description = "RDS cluster endpoint"
+  type        = string
+  default     = ""
+}
+
+variable "db_port" {
+  description = "RDS port"
+  type        = number
+  default     = 5432
+}
+
+variable "db_name" {
+  description = "Database name"
+  type        = string
+  default     = "bankingdb"
+}
+
+variable "db_secret_arn" {
+  description = "Secrets Manager ARN for DB credentials"
+  type        = string
+  default     = ""
+}

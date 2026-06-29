@@ -104,3 +104,10 @@ output "primary_region" {
   description = "Primary AWS region"
   value       = var.primary_region
 }
+
+# ─── ECR ──────────────────────────────────────────────────────────────────────
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for banking app"
+  value       = module.ecr.repository_url
+}

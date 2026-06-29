@@ -88,6 +88,22 @@ resource "aws_ecs_task_definition" "this" {
         {
           name  = "PORT"
           value = tostring(var.container_port)
+        },
+        {
+          name  = "DB_HOST"
+          value = var.db_host
+        },
+        {
+          name  = "DB_PORT"
+          value = tostring(var.db_port)
+        },
+        {
+          name  = "DB_NAME"
+          value = var.db_name
+        },
+        {
+          name  = "DB_SSL"
+          value = "true"
         }
       ]
 
@@ -101,7 +117,7 @@ resource "aws_ecs_task_definition" "this" {
       }
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:${var.container_port}/health || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:${var.container_port}/api/health || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3

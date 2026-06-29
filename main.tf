@@ -66,6 +66,16 @@ module "s3" {
   dr_bucket_arn      = "" # Set to DR bucket ARN when DR is configured
 }
 
+# ─── 5b. ECR — Container Registry ────────────────────────────────────────────
+
+module "ecr" {
+  source = "./modules/ecr"
+
+  name_prefix = local.name_prefix
+  environment = local.environment
+  kms_key_arn = module.kms.app_key_arn
+}
+
 # ─── 6. Route53 DNS Zone ─────────────────────────────────────────────────────
 
 module "route53" {
@@ -127,8 +137,8 @@ module "ecs" {
   target_group_arn   = module.alb.target_group_arn
   execution_role_arn = module.iam.ecs_execution_role_arn
   task_role_arn      = module.iam.ecs_task_role_arn
-  container_image    = var.container_image
-  container_port     = var.container_port
+  container_image    = "${module.ecr.repository_url}:latest"
+  container_port     = 3000
   cpu                = local.config.ecs_cpu
   memory             = local.config.ecs_memory
   desired_count      = local.config.ecs_desired_count
@@ -136,6 +146,12 @@ module "ecs" {
   max_count          = local.config.ecs_max_count
   kms_key_arn        = module.kms.logs_key_arn
   kms_key_id         = module.kms.app_key_id
+
+  # Banking app DB connection
+  db_host       = module.rds.cluster_endpoint
+  db_port       = module.rds.port
+  db_name       = var.db_name
+  db_secret_arn = module.rds.secret_arn
 }
 
 # ─── 10. Aurora RDS Database ─────────────────────────────────────────────────
