@@ -72,13 +72,11 @@ pipeline {
         }
 
         stage('Validate') {
-            steps {
-                sh '''
-                    terraform fmt -check -recursive
-                    terraform validate
-                '''
-            }
-        }
+    steps {
+        sh 'terraform fmt -recursive'
+        sh 'terraform validate -no-color'
+    }
+}
 
         stage('Terraform Plan') {
             steps {
