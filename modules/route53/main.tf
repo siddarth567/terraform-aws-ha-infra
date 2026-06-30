@@ -91,7 +91,7 @@ resource "aws_route53_record" "primary" {
 }
 
 resource "aws_route53_record" "secondary" {
-  count = var.enable_failover && var.enable_dr ? 1 : 0
+  count = var.enable_failover && var.enable_dr && var.dr_alb_dns != "" && var.dr_alb_zone_id != "" ? 1 : 0
 
   zone_id = local.zone_id
   name    = "app.${var.domain_name}"
