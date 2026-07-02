@@ -26,9 +26,7 @@
  */
 
 pipeline {
-    agent {
-        label 'terraform'
-    }
+    agent any
 
     parameters {
         choice(
