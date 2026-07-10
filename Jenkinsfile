@@ -98,7 +98,7 @@ pipeline {
                             -backend-config="bucket=terraform-ha-infra-state" \
                             -backend-config="key=infrastructure/terraform.tfstate" \
                             -backend-config="region=${AWS_REGION}" \
-                            -backend-config="dynamodb_table=terraform-ha-infra-lock" \
+                            -backend-config="use_lockfile=true" \
                             -backend-config="encrypt=true" \
                             -no-color
                     '''
