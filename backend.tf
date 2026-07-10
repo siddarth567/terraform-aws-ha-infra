@@ -11,11 +11,11 @@
 
 terraform {
   backend "s3" {
-    bucket         = "terraform-ha-infra-state"
-    key            = "infrastructure/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    use_lockfile   = true      # replaces deprecated dynamodb_table (requires S3 versioning)
+    bucket       = "terraform-ha-infra-state"
+    key          = "infrastructure/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true # replaces deprecated dynamodb_table (requires S3 versioning)
 
     # Enable S3 bucket versioning for state file history
     # These settings should be configured on the S3 bucket itself:
