@@ -6,7 +6,7 @@
  *
  * Flow:
  *   1. Infrastructure: Terraform init → plan → approve → apply
- *   2. Application:    Backend (Docker → ECR → ECS) + Frontend (S3 → CloudFront)
+ *   2. Application:    Backend (Docker → ECR → ECS) + Frontend (S3 → ALB)
  *   3. Database:       Optional first-run schema init via bastion
  *
  * Prerequisites:
@@ -123,6 +123,7 @@ pipeline {
                 }
             }
         }
+
         // ─── Stage 4: Validate ──────────────────────────────────────────────
         stage('Validate') {
             steps {
@@ -218,7 +219,7 @@ pipeline {
                         env.ECS_CLUSTER  = sh(script: 'terraform output -raw ecs_cluster_name', returnStdout: true).trim()
                         env.ECS_SERVICE  = sh(script: 'terraform output -raw ecs_service_name', returnStdout: true).trim()
                         env.APP_BUCKET   = sh(script: 'terraform output -raw app_bucket_name', returnStdout: true).trim()
-                        env.CF_DOMAIN    = sh(script: 'terraform output -raw cloudfront_domain_name', returnStdout: true).trim()
+                        env.ALB_DNS      = sh(script: 'terraform output -raw alb_dns_name', returnStdout: true).trim()
                         env.DEPLOY_REGION = sh(script: 'terraform output -raw primary_region', returnStdout: true).trim()
 
                         echo """
@@ -228,7 +229,7 @@ pipeline {
                         │  ECR:        ${env.ECR_URL}
                         │  ECS:        ${env.ECS_CLUSTER} / ${env.ECS_SERVICE}
                         │  S3 Bucket:  ${env.APP_BUCKET}
-                        │  CloudFront: ${env.CF_DOMAIN}
+                        │  ALB DNS:    ${env.ALB_DNS}
                         │  Region:     ${env.DEPLOY_REGION}
                         └──────────────────────────────────────────────────┘
                         """
@@ -331,8 +332,8 @@ pipeline {
             }
         }
 
-        // ─── Stage 11: Deploy Frontend to S3 + CloudFront ───────────────────
-        stage('Frontend: S3 + CloudFront') {
+        // ─── Stage 11: Deploy Frontend to S3 ─────────────────────────────────
+        stage('Frontend: S3 Deploy') {
             when {
                 expression {
                     return params.ACTION == 'apply' && params.DEPLOY_APP
@@ -355,29 +356,8 @@ pipeline {
                                 --region ${env.DEPLOY_REGION}
                         """
 
-                        // Invalidate CloudFront cache
-                        echo "🔄 Invalidating CloudFront cache..."
-                        def cfDistId = sh(
-                            script: """
-                                aws cloudfront list-distributions \
-                                    --query "DistributionList.Items[?DomainName=='${env.CF_DOMAIN}'].Id" \
-                                    --output text
-                            """,
-                            returnStdout: true
-                        ).trim()
-
-                        if (cfDistId && cfDistId != 'None') {
-                            sh """
-                                aws cloudfront create-invalidation \
-                                    --distribution-id ${cfDistId} \
-                                    --paths "/frontend/*" "/*"
-                            """
-                            echo "✅ CloudFront invalidation created for distribution: ${cfDistId}"
-                        } else {
-                            echo "⚠️  CloudFront distribution not found, skipping invalidation"
-                        }
-
                         echo "✅ Frontend deployed to s3://${env.APP_BUCKET}/frontend/"
+                        echo "🌐 Access via ALB: http://${env.ALB_DNS}"
                     }
                 }
             }
@@ -441,9 +421,9 @@ pipeline {
                     ║  🎉  DEPLOYMENT COMPLETE — ${params.ENVIRONMENT.toUpperCase()}                          ║
                     ╠══════════════════════════════════════════════════════════╣
                     ║                                                          ║
-                    ║  Frontend:  https://${env.CF_DOMAIN}/frontend/            ║
-                    ║  API:       https://${env.CF_DOMAIN}/api/                 ║
-                    ║  Health:    https://${env.CF_DOMAIN}/api/health            ║
+                    ║  Frontend:  http://${env.ALB_DNS}/                        ║
+                    ║  API:       http://${env.ALB_DNS}/api/                    ║
+                    ║  Health:    http://${env.ALB_DNS}/api/health              ║
                     ║                                                          ║
                     ║  Build:     #${env.BUILD_NUMBER}                          ║
                     ║  Image:     ${env.ECR_URL}:${env.BUILD_NUMBER}            ║
@@ -476,7 +456,7 @@ pipeline {
                 //     color: 'good',
                 //     message: "${emoji} *${params.ENVIRONMENT.toUpperCase()}* — Terraform ${params.ACTION} succeeded${appMsg}\n" +
                 //              "Build: ${env.BUILD_URL}\n" +
-                //              (params.DEPLOY_APP ? "Frontend: https://${env.CF_DOMAIN}/frontend/\n" : '') +
+                //              (params.DEPLOY_APP ? "Frontend: http://${env.ALB_DNS}/\n" : '') +
                 //              "Triggered by: ${currentBuild.getBuildCauses()[0].shortDescription}"
                 // )
             }
