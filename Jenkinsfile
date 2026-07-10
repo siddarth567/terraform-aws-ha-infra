@@ -107,16 +107,22 @@ pipeline {
         }
 
         // ─── Stage 3: Workspace ─────────────────────────────────────────────
-        stage('Select Workspace') {
+       stage('Select Workspace') {
             steps {
-                sh """
-                    terraform workspace select ${params.ENVIRONMENT} || \
-                    terraform workspace new ${params.ENVIRONMENT}
-                """
-                sh 'terraform workspace show'
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-terraform-credentials',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+
+                    sh """
+                        terraform workspace list
+                        terraform workspace select ${params.ENVIRONMENT} || terraform workspace new ${params.ENVIRONMENT}
+                        terraform workspace show
+                    """
+                }
             }
         }
-
         // ─── Stage 4: Validate ──────────────────────────────────────────────
         stage('Validate') {
             steps {
