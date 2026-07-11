@@ -45,15 +45,15 @@ output "ecs_service_name" {
 
 # ─── Database ─────────────────────────────────────────────────────────────────
 
-output "rds_cluster_endpoint" {
+output "rds_endpoint" {
   description = "Writer endpoint of the Aurora cluster"
-  value       = module.rds.cluster_endpoint
+  value       = module.rds.endpoint
   sensitive   = true
 }
 
-output "rds_reader_endpoint" {
+output "rds_port" {
   description = "Reader endpoint of the Aurora cluster"
-  value       = module.rds.reader_endpoint
+  value       = module.rds.port
   sensitive   = true
 }
 
