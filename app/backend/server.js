@@ -127,6 +127,27 @@ app.get('/api/transactions', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    application: 'Banking API',
+    status: 'Running',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Health check for ALB
+app.get('/api/health', (req, res) =>
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  })
+);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Banking API running on port ${PORT}`));
+
 // Health check for ALB
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
