@@ -17,7 +17,7 @@ enable_vpc_flow_logs = true
 
 # Compute
 container_image = "nginx:latest"
-container_port  = 80
+container_port  = 3000
 
 # Database
 db_engine_version  = "15.7"

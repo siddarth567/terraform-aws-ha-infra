@@ -89,6 +89,7 @@ module "alb" {
   public_subnet_ids          = module.vpc.public_subnet_ids
   security_group_id          = module.security_groups.alb_sg_id
   container_port             = var.container_port
+  health_check_path          = "/api/health"
   enable_deletion_protection = var.enable_deletion_protection
   enable_access_logs         = true
   access_logs_bucket         = module.s3.alb_logs_bucket_name
