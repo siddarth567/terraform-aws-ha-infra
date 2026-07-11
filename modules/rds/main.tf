@@ -37,8 +37,8 @@ resource "aws_secretsmanager_secret_version" "db_password" {
 # ─── RDS PostgreSQL Instance ─────────────────────────────────────────────────
 
 resource "aws_db_instance" "this" {
-  identifier = "${var.name_prefix}-postgres"
-  engine     = "postgres"
+  identifier     = "${var.name_prefix}-postgres"
+  engine         = "postgres"
   engine_version = var.engine_version
 
   instance_class        = var.instance_class
