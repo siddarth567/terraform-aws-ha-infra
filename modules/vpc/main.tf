@@ -215,6 +215,10 @@ resource "aws_cloudwatch_log_group" "flow_logs" {
   tags = {
     Name = "${var.name_prefix}-flow-logs"
   }
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 }
 
 ################################################################################
