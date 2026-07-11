@@ -62,12 +62,12 @@ resource "aws_db_instance" "this" {
   kms_key_id        = var.kms_key_arn
 
   # Backup & Recovery
-  backup_retention_period      = var.backup_retention_period
-  backup_window                = "03:00-04:00"
-  maintenance_window           = "sun:04:00-sun:05:00"
-  copy_tags_to_snapshot        = true
-  final_snapshot_identifier    = "${var.name_prefix}-final-snapshot"
-  skip_final_snapshot          = var.environment == "dev" ? true : false
+  backup_retention_period   = var.backup_retention_period
+  backup_window             = "03:00-04:00"
+  maintenance_window        = "sun:04:00-sun:05:00"
+  copy_tags_to_snapshot     = true
+  final_snapshot_identifier = "${var.name_prefix}-final-snapshot"
+  skip_final_snapshot       = var.environment == "dev" ? true : false
 
   # Protection
   deletion_protection = var.deletion_protection
