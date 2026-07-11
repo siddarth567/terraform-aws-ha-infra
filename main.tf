@@ -120,7 +120,7 @@ module "ecs" {
   kms_key_id         = module.kms.app_key_id
 
   # Banking app DB connection
-  db_host       = module.rds.cluster_endpoint
+  db_host       = module.rds.endpoint
   db_port       = module.rds.port
   db_name       = var.db_name
   db_secret_arn = module.rds.secret_arn
