@@ -1,5 +1,5 @@
 ################################################################################
-# RDS Module — Aurora PostgreSQL Multi-AZ Cluster
+# RDS Module — PostgreSQL (Standard RDS for free tier, Aurora for prod)
 ################################################################################
 
 # ─── Random password for DB master user ──────────────────────────────────────
@@ -13,7 +13,7 @@ resource "random_password" "master" {
 # Store password in Secrets Manager
 resource "aws_secretsmanager_secret" "db_password" {
   name                    = "${var.name_prefix}/rds/master-password"
-  description             = "Master password for ${var.name_prefix} Aurora cluster"
+  description             = "Master password for ${var.name_prefix} database"
   kms_key_id              = var.kms_key_arn
   recovery_window_in_days = var.environment == "dev" ? 0 : 7
 
@@ -27,30 +27,35 @@ resource "aws_secretsmanager_secret_version" "db_password" {
   secret_string = jsonencode({
     username = var.master_username
     password = random_password.master.result
-    engine   = "aurora-postgresql"
-    host     = aws_rds_cluster.this.endpoint
+    engine   = "postgres"
+    host     = aws_db_instance.this.address
     port     = 5432
     dbname   = var.database_name
   })
 }
 
-# ─── Aurora Cluster ───────────────────────────────────────────────────────────
+# ─── RDS PostgreSQL Instance ─────────────────────────────────────────────────
 
-resource "aws_rds_cluster" "this" {
-  cluster_identifier = "${var.name_prefix}-aurora"
-  engine             = "aurora-postgresql"
-  engine_version     = var.engine_version
-  engine_mode        = "provisioned"
-  storage_type       = "aurora-iopt1"
+resource "aws_db_instance" "this" {
+  identifier = "${var.name_prefix}-postgres"
+  engine     = "postgres"
+  engine_version = var.engine_version
 
-  database_name   = var.database_name
-  master_username = var.master_username
-  master_password = random_password.master.result
+  instance_class        = var.instance_class
+  allocated_storage     = var.allocated_storage
+  max_allocated_storage = var.max_allocated_storage
+  storage_type          = "gp3"
+
+  db_name  = var.database_name
+  username = var.master_username
+  password = random_password.master.result
 
   # Networking
   db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = [var.security_group_id]
   port                   = 5432
+  publicly_accessible    = false
+  multi_az               = var.environment != "dev"
 
   # Encryption
   storage_encrypted = true
@@ -58,55 +63,29 @@ resource "aws_rds_cluster" "this" {
 
   # Backup & Recovery
   backup_retention_period      = var.backup_retention_period
-  preferred_backup_window      = "03:00-04:00"
-  preferred_maintenance_window = "sun:04:00-sun:05:00"
+  backup_window                = "03:00-04:00"
+  maintenance_window           = "sun:04:00-sun:05:00"
   copy_tags_to_snapshot        = true
   final_snapshot_identifier    = "${var.name_prefix}-final-snapshot"
   skip_final_snapshot          = var.environment == "dev" ? true : false
 
   # Protection
-  deletion_protection             = var.deletion_protection
-  enabled_cloudwatch_logs_exports = ["postgresql"]
+  deletion_protection = var.deletion_protection
 
-  # Serverless V2 scaling (optional)
-  dynamic "serverlessv2_scaling_configuration" {
-    for_each = var.enable_serverless ? [1] : []
-    content {
-      min_capacity = var.serverless_min_capacity
-      max_capacity = var.serverless_max_capacity
-    }
-  }
+  # Monitoring
+  performance_insights_enabled    = true
+  performance_insights_kms_key_id = var.kms_key_arn
+  monitoring_interval             = 60
+  monitoring_role_arn             = aws_iam_role.rds_monitoring.arn
+
+  auto_minor_version_upgrade = true
 
   tags = {
-    Name = "${var.name_prefix}-aurora"
+    Name = "${var.name_prefix}-postgres"
   }
 
   lifecycle {
-    ignore_changes = [master_password]
-  }
-}
-
-# ─── Aurora Instances ─────────────────────────────────────────────────────────
-
-resource "aws_rds_cluster_instance" "this" {
-  count = var.instance_count
-
-  identifier         = "${var.name_prefix}-aurora-${count.index}"
-  cluster_identifier = aws_rds_cluster.this.id
-  instance_class     = var.enable_serverless ? "db.serverless" : var.instance_class
-  engine             = aws_rds_cluster.this.engine
-  engine_version     = aws_rds_cluster.this.engine_version
-
-  publicly_accessible             = false
-  auto_minor_version_upgrade      = true
-  performance_insights_enabled    = true
-  performance_insights_kms_key_id = var.kms_key_arn
-
-  monitoring_interval = 60
-  monitoring_role_arn = aws_iam_role.rds_monitoring.arn
-
-  tags = {
-    Name = "${var.name_prefix}-aurora-${count.index}"
+    ignore_changes = [password]
   }
 }
 

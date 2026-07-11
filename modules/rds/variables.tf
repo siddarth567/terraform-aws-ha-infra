@@ -21,21 +21,27 @@ variable "master_username" {
 }
 
 variable "engine_version" {
-  description = "Aurora PostgreSQL engine version"
+  description = "PostgreSQL engine version"
   type        = string
   default     = "15.4"
 }
 
-variable "instance_count" {
-  description = "Number of Aurora instances"
-  type        = number
-  default     = 2
+variable "instance_class" {
+  description = "Instance class for RDS"
+  type        = string
+  default     = "db.t3.micro"
 }
 
-variable "instance_class" {
-  description = "Instance class for Aurora instances"
-  type        = string
-  default     = "db.t3.medium"
+variable "allocated_storage" {
+  description = "Allocated storage in GB"
+  type        = number
+  default     = 20
+}
+
+variable "max_allocated_storage" {
+  description = "Maximum allocated storage for autoscaling in GB"
+  type        = number
+  default     = 100
 }
 
 variable "db_subnet_group_name" {
@@ -56,29 +62,11 @@ variable "kms_key_arn" {
 variable "backup_retention_period" {
   description = "Backup retention period in days"
   type        = number
-  default     = 7
+  default     = 1
 }
 
 variable "deletion_protection" {
   description = "Enable deletion protection"
   type        = bool
   default     = false
-}
-
-variable "enable_serverless" {
-  description = "Use Aurora Serverless v2"
-  type        = bool
-  default     = false
-}
-
-variable "serverless_min_capacity" {
-  description = "Minimum ACU for serverless"
-  type        = number
-  default     = 0.5
-}
-
-variable "serverless_max_capacity" {
-  description = "Maximum ACU for serverless"
-  type        = number
-  default     = 4
 }

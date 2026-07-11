@@ -29,7 +29,7 @@ locals {
       ecs_cpu                 = 256
       ecs_memory              = 512
       rds_instance_count      = 1
-      rds_instance_class      = "db.t3.medium"
+      rds_instance_class      = "db.t3.micro"
       rds_backup_retention    = 1
       rds_deletion_protection = false
       redis_node_type         = "cache.t3.micro"

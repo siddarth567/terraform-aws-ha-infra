@@ -126,7 +126,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 
   dimensions = {
-    DBClusterIdentifier = var.rds_cluster_id
+    DBInstanceIdentifier = var.rds_cluster_id
   }
 
   tags = {
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_storage_low" {
   alarm_actions       = [aws_sns_topic.alerts.arn]
 
   dimensions = {
-    DBClusterIdentifier = var.rds_cluster_id
+    DBInstanceIdentifier = var.rds_cluster_id
   }
 
   tags = {
@@ -238,7 +238,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         properties = {
           title = "RDS CPU Utilization"
           metrics = [
-            ["AWS/RDS", "CPUUtilization", "DBClusterIdentifier", var.rds_cluster_id]
+            ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", var.rds_cluster_id]
           ]
           period = 300
           stat   = "Average"

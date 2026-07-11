@@ -1,26 +1,26 @@
 output "cluster_endpoint" {
-  description = "Writer endpoint of the Aurora cluster"
-  value       = aws_rds_cluster.this.endpoint
+  description = "Endpoint of the RDS instance"
+  value       = aws_db_instance.this.address
 }
 
 output "reader_endpoint" {
-  description = "Reader endpoint of the Aurora cluster"
-  value       = aws_rds_cluster.this.reader_endpoint
+  description = "Endpoint of the RDS instance (same as writer for standard RDS)"
+  value       = aws_db_instance.this.address
 }
 
 output "cluster_id" {
-  description = "ID of the Aurora cluster"
-  value       = aws_rds_cluster.this.id
+  description = "Identifier of the RDS instance"
+  value       = aws_db_instance.this.identifier
 }
 
 output "cluster_arn" {
-  description = "ARN of the Aurora cluster"
-  value       = aws_rds_cluster.this.arn
+  description = "ARN of the RDS instance"
+  value       = aws_db_instance.this.arn
 }
 
 output "port" {
   description = "Database port"
-  value       = aws_rds_cluster.this.port
+  value       = aws_db_instance.this.port
 }
 
 output "secret_arn" {

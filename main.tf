@@ -125,7 +125,7 @@ module "ecs" {
   db_secret_arn = module.rds.secret_arn
 }
 
-# ─── 10. Aurora RDS Database ─────────────────────────────────────────────────
+# ─── 10. RDS PostgreSQL Database ─────────────────────────────────────────────
 
 module "rds" {
   source = "./modules/rds"
@@ -135,7 +135,6 @@ module "rds" {
   database_name           = var.db_name
   master_username         = var.db_master_username
   engine_version          = var.db_engine_version
-  instance_count          = local.config.rds_instance_count
   instance_class          = local.config.rds_instance_class
   db_subnet_group_name    = module.vpc.db_subnet_group_name
   security_group_id       = module.security_groups.rds_sg_id
