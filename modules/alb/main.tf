@@ -27,7 +27,7 @@ resource "aws_lb" "this" {
 # ─── Target Group ────────────────────────────────────────────────────────────
 
 resource "aws_lb_target_group" "this" {
-  name        = "${var.name_prefix}-tg"
+  name        = "${var.name_prefix}-tg-${var.container_port}"
   port        = var.container_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
