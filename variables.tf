@@ -106,7 +106,7 @@ variable "enable_deletion_protection" {
 variable "alert_email" {
   description = "Email address for CloudWatch alarm notifications"
   type        = string
-  default     = "alerts@example.com"
+  default     = "ksiddharth263@gmail.com"
 }
 
 # ─── Feature Flags (overridden per environment) ──────────────────────────────
