@@ -133,7 +133,21 @@ resource "aws_kms_key" "logs" {
           "kms:DescribeKey"
         ]
         Resource = "*"
-      }
+      },
+{
+  Sid    = "AllowCloudTrail"
+  Effect = "Allow"
+  Principal = {
+    Service = "cloudtrail.amazonaws.com"
+  }
+  Action = [
+    "kms:GenerateDataKey*",
+    "kms:Decrypt",
+    "kms:DescribeKey",
+    "kms:CreateGrant"
+  ]
+  Resource = "*"
+}
     ]
   })
 
