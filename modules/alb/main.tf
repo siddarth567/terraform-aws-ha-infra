@@ -62,9 +62,11 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
-# ─── HTTPS Listener ──────────────────────────────────────────────────────────
+# ─── HTTPS Listener (only when certificate is provided) ──────────────────────
 
 resource "aws_lb_listener" "https" {
+  count = var.certificate_arn != "" ? 1 : 0
+
   load_balancer_arn = aws_lb.this.arn
   port              = 443
   protocol          = "HTTPS"
@@ -81,24 +83,29 @@ resource "aws_lb_listener" "https" {
   }
 }
 
-# ─── HTTP → HTTPS Redirect ───────────────────────────────────────────────────
+# ─── HTTP Listener ───────────────────────────────────────────────────────────
+# Redirects to HTTPS when a certificate is present, otherwise forwards directly
 
-resource "aws_lb_listener" "http_redirect" {
+resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type             = var.certificate_arn != "" ? "redirect" : "forward"
+    target_group_arn = var.certificate_arn != "" ? null : aws_lb_target_group.this.arn
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    dynamic "redirect" {
+      for_each = var.certificate_arn != "" ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   }
 
   tags = {
-    Name = "${var.name_prefix}-http-redirect"
+    Name = "${var.name_prefix}-http-listener"
   }
 }

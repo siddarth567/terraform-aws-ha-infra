@@ -93,21 +93,7 @@ module "route53" {
   create_cloudfront_record  = true
 }
 
-# ─── 7. ACM Certificates ─────────────────────────────────────────────────────
-
-module "acm" {
-  source = "./modules/acm"
-
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
-
-  name_prefix = local.name_prefix
-  domain_name = var.domain_name
-  zone_id     = module.route53.zone_id
-}
-
-# ─── 8. Application Load Balancer ────────────────────────────────────────────
+# ─── 7. Application Load Balancer ────────────────────────────────────────────
 
 module "alb" {
   source = "./modules/alb"
@@ -116,14 +102,13 @@ module "alb" {
   vpc_id                     = module.vpc.vpc_id
   public_subnet_ids          = module.vpc.public_subnet_ids
   security_group_id          = module.security_groups.alb_sg_id
-  certificate_arn            = module.acm.primary_certificate_arn
   container_port             = var.container_port
   enable_deletion_protection = var.enable_deletion_protection
   enable_access_logs         = true
   access_logs_bucket         = module.s3.alb_logs_bucket_name
 }
 
-# ─── 9. ECS Fargate Cluster & Service ────────────────────────────────────────
+# ─── 8. ECS Fargate Cluster & Service ────────────────────────────────────────
 
 module "ecs" {
   source = "./modules/ecs"
@@ -152,9 +137,11 @@ module "ecs" {
   db_port       = module.rds.port
   db_name       = var.db_name
   db_secret_arn = module.rds.secret_arn
+
+  depends_on = [module.alb]
 }
 
-# ─── 10. Aurora RDS Database ─────────────────────────────────────────────────
+# ─── 9. Aurora RDS Database ──────────────────────────────────────────────────
 
 module "rds" {
   source = "./modules/rds"
@@ -173,7 +160,7 @@ module "rds" {
   deletion_protection     = local.config.rds_deletion_protection
 }
 
-# ─── 11. ElastiCache Redis ───────────────────────────────────────────────────
+# ─── 10. ElastiCache Redis ───────────────────────────────────────────────────
 
 module "elasticache" {
   source = "./modules/elasticache"
@@ -189,7 +176,7 @@ module "elasticache" {
   sns_topic_arn      = module.monitoring.sns_topic_arn
 }
 
-# ─── 12. WAF v2 (CloudFront scope — must use us-east-1 provider) ────────────
+# ─── 11. WAF v2 (CloudFront scope — must use us-east-1 provider) ────────────
 
 module "waf" {
   source = "./modules/waf"
@@ -204,19 +191,17 @@ module "waf" {
   rate_limit  = 2000
 }
 
-# ─── 13. CloudFront CDN ──────────────────────────────────────────────────────
+# ─── 12. CloudFront CDN ──────────────────────────────────────────────────────
 
 module "cloudfront" {
   source = "./modules/cloudfront"
 
   name_prefix     = local.name_prefix
   alb_dns_name    = module.alb.alb_dns_name
-  certificate_arn = module.acm.cloudfront_certificate_arn
-  domain_aliases  = [var.domain_name, "www.${var.domain_name}"]
   waf_acl_arn     = local.config.enable_waf ? module.waf[0].web_acl_arn : ""
 }
 
-# ─── 14. Bastion Host ────────────────────────────────────────────────────────
+# ─── 13. Bastion Host ────────────────────────────────────────────────────────
 
 module "bastion" {
   source = "./modules/bastion"
@@ -230,7 +215,7 @@ module "bastion" {
   kms_key_arn           = module.kms.app_key_arn
 }
 
-# ─── 15. Monitoring — CloudWatch, CloudTrail, SNS ────────────────────────────
+# ─── 14. Monitoring — CloudWatch, CloudTrail, SNS ────────────────────────────
 
 module "monitoring" {
   source = "./modules/monitoring"

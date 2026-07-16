@@ -69,7 +69,7 @@ variable "container_port" {
 variable "db_engine_version" {
   description = "Aurora PostgreSQL engine version"
   type        = string
-  default     = "15.4"
+  default     = "15.8"
 }
 
 variable "db_name" {
@@ -90,7 +90,7 @@ variable "db_master_username" {
 variable "domain_name" {
   description = "Root domain name for Route53 and certificates"
   type        = string
-  default     = "example.com"
+  default     = "sidsdestination.shop"
 }
 
 variable "create_dns_zone" {

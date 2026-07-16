@@ -19,8 +19,9 @@ variable "security_group_id" {
 }
 
 variable "certificate_arn" {
-  description = "ACM certificate ARN for HTTPS"
+  description = "ACM certificate ARN for HTTPS (leave empty to skip HTTPS listener)"
   type        = string
+  default     = ""
 }
 
 variable "container_port" {

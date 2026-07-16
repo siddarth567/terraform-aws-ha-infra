@@ -53,10 +53,20 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   # SSL Certificate
-  viewer_certificate {
-    acm_certificate_arn      = var.certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+  dynamic "viewer_certificate" {
+    for_each = var.certificate_arn != "" ? [1] : []
+    content {
+      acm_certificate_arn      = var.certificate_arn
+      ssl_support_method       = "sni-only"
+      minimum_protocol_version = "TLSv1.2_2021"
+    }
+  }
+
+  dynamic "viewer_certificate" {
+    for_each = var.certificate_arn != "" ? [] : [1]
+    content {
+      cloudfront_default_certificate = true
+    }
   }
 
   # Geographic restrictions

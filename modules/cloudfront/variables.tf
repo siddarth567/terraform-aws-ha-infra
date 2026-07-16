@@ -7,8 +7,9 @@ variable "alb_dns_name" {
 }
 
 variable "certificate_arn" {
-  description = "ACM certificate ARN (must be in us-east-1 for CloudFront)"
+  description = "ACM certificate ARN (must be in us-east-1 for CloudFront). Leave empty to use CloudFront default certificate."
   type        = string
+  default     = ""
 }
 
 variable "domain_aliases" {
